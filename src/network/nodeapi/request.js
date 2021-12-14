@@ -1,11 +1,9 @@
 import axios from 'axios'
-import router from '../../router'
-import { Message } from 'element-ui'
 
 // create an axios instance
 const service = axios.create({
-    baseURL: 'http://192.168.3.3:8000/api/', // url = base url + request url
-    timeout: 5000 // request timeout
+    baseURL: 'http://127.0.0.1:3000/',
+    timeout: 5000
 })
 
 // 请求拦截器
@@ -18,8 +16,6 @@ service.interceptors.request.use(
         return config
     },
     error => {
-        // do something with request error
-        console.log(error) // for debug
         return Promise.reject(error)
     }
 )
@@ -34,20 +30,19 @@ service.interceptors.response.use(
         }
     },
     error => {
-        console.log(error, 0.0);
-        let { status } = error.response
-        let message = 'req:' + error.message
+        // let { status } = error.response
+        // let message = 'req:' + error.message
 
-        if (status == 400) {}
-        if (status == 401) {
-            router.replace({ name: 'login' })
-        }
+        // if (status == 400) {}
+        // if (status == 401) {
+        //     router.replace({ name: 'login' })
+        // }
 
-        Message({
-            message,
-            type: 'error',
-            duration: 5 * 1000
-        })
+        // Message({
+        //     message,
+        //     type: 'error',
+        //     duration: 5 * 1000
+        // })
         return Promise.reject(error)
     }
 )

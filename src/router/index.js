@@ -206,24 +206,73 @@ export const constantRoutes = [{
                 meta: {
                     title: '综合积分制度',
                 }
+            }, {
+                path: 'Fdyawa',
+                component: () =>
+                    import ('views/students/StudentScore/fdyawa.vue'),
+                name: 'Fdyawa',
+                meta: {
+                    title: '导员加分审核',
+                    roles: ['admin', 'fdy']
+                },
+
             },
+            {
+                path: 'Fdysub',
+                component: () =>
+                    import ('views/students/StudentScore/fdysub.vue'),
+                name: 'Fdysub',
+                meta: {
+                    title: '导员减分审核',
+                    roles: ['admin', 'fdy']
+                },
+
+            },
+
+            {
+                path: 'Dcawa',
+                component: () =>
+                    import ('views/students/StudentScore/dcawa.vue'),
+                name: 'Dcawa',
+                meta: {
+                    title: '督察加分审核',
+                    roles: ['admin', 'dc']
+                },
+
+            },
+            {
+                path: 'Dcsub',
+                component: () =>
+                    import ('views/students/StudentScore/dcsub.vue'),
+                name: 'Dcsub',
+                meta: {
+                    title: '督察减分审核',
+                    roles: ['admin', 'dc']
+                },
+
+            },
+            {
+                path: 'jsshow',
+                component: () =>
+                    import ('views/students/StudentScore/jsshow'),
+                name: 'jsshow',
+                meta: {
+                    title: '讲师查看',
+                    roles: ['admin', 'js']
+                },
+
+            },
+
             {
                 path: 'Edit',
                 component: () =>
                     import ('views/students/StudentScore/Edit'),
                 name: 'Edit',
                 meta: {
-                    title: '积分变动处理',
-                }
-            },
-            {
-                path: 'List',
-                component: () =>
-                    import ('views/students/StudentScore/List'),
-                name: 'List',
-                meta: {
-                    title: '积分变动列表',
-                }
+                    title: '学生加/减分',
+                    roles: ['admin', 'fdy', 'dc', 'js']
+                },
+
             },
         ]
     },
@@ -232,12 +281,14 @@ export const constantRoutes = [{
         path: '/icon',
         component: Layout,
         children: [{
-            path: 'index',
-            component: () =>
-                import ('@/views/icons/index'),
-            name: 'Icons',
-            meta: { title: 'Icon图标', icon: 'icon', noCache: true }
-        }]
+                path: 'index',
+                component: () =>
+                    import ('@/views/icons/index'),
+                name: 'Icons',
+                meta: { title: 'Icon图标', icon: 'icon', noCache: true }
+            },
+
+        ]
     },
 ]
 

@@ -7,17 +7,17 @@
         <div class="search">
           <el-col :span="3">
             <el-input
-              placeholder="请输入名称"
+              placeholder="请输入班级名称"
               v-model="queryInfo.query.name"
               clearable
               @clear="getClasses"
             ></el-input
           ></el-col>
-          <el-col :span="3">
+          <el-col :span="3" v-permission="['admin']">
             <el-select
-              v-model="queryInfo.query.college"
-              placeholder="选择所属学院"
+              v-model="queryInfo.query.depar_id"
               clearable
+              placeholder="选择所属学院"
             >
               <el-option
                 v-for="item in collegeoptions1"
@@ -27,30 +27,57 @@
               >
               </el-option> </el-select
           ></el-col>
-          <!-- <el-col :span="3">
+          <el-col :span="3" v-permission="['admin']">
             <el-select
-              v-model="queryInfo.query.stage"
-              placeholder="选择现处阶段"
+              v-model="queryInfo.query.fdy_id"
+              clearable
+              :disabled="fdyjs"
+              placeholder="导员:请先选择学院"
             >
               <el-option
-                v-for="item in stageoptions1"
+                v-for="item in sfdyoptions"
                 :key="item.value"
                 :label="item.label"
                 :value="item.value"
               >
               </el-option>
             </el-select>
-          </el-col> -->
-          <el-col :span="3">
-            <el-input
-              placeholder="请输入宿舍号"
-              v-model="queryInfo.query.room_number"
+          </el-col>
+          <el-col :span="3" v-permission="['admin']">
+            <el-select
+              v-model="queryInfo.query.js_id"
               clearable
-              @clear="getClasses"
-            ></el-input
-          ></el-col>
+              :disabled="fdyjs"
+              placeholder="讲师:请先选择学院"
+            >
+              <el-option
+                v-for="item in sjsoptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              >
+              </el-option>
+            </el-select>
+          </el-col>
+          <el-col :span="3" v-permission="['fdy']">
+            <el-select
+              v-model="queryInfo.query.js_id"
+              clearable
+              :disabled="fdyjs"
+              placeholder="请先选择讲师"
+            >
+              <el-option
+                v-for="item in sjsoptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              >
+              </el-option>
+            </el-select>
+          </el-col>
+
           <!-- 此功能不能使用 -->
-          <el-col :span="3">
+          <!-- <el-col :span="3">
             <el-input
               placeholder="请输入班级人数"
               v-model="queryInfo.query.sum"
@@ -58,7 +85,7 @@
               @clear="getClasses"
               disabled
             ></el-input
-          ></el-col>
+          ></el-col> -->
           <el-col :span="1">
             <el-button
               type="primary"
@@ -73,29 +100,14 @@
         </div>
 
         <el-col :span="4">
-          <el-button type="primary" @click="addClasses1">添加班级</el-button>
+          <el-button
+            type="primary"
+            @click="addClasses1"
+            v-permission="['admin']"
+            >添加班级</el-button
+          >
         </el-col>
       </el-row>
-
-      <!-- 全选反选按钮 -->
-      <div style="margin-top: 20px">
-        <el-button @click="alltoggleSelection()">全选,反选</el-button>
-        <el-button @click="toggleSelection()">取消选择</el-button>
-        <el-button @click="deltoggleSelection()">批量删除</el-button>
-      </div>
-
-      <!-- 分页区域 -->
-      <el-pagination
-        style="margin-top: 20px"
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        :current-page="queryInfo.pagenum"
-        :page-sizes="[5, 10, 15]"
-        :page-size="queryInfo.pagesize"
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="total"
-      >
-      </el-pagination>
     </el-card>
     <!-- 用户列表区域 -->
     <el-table
@@ -192,8 +204,6 @@
         <el-button type="primary" @click="addClasses">确 定</el-button>
       </span>
     </el-dialog>
-
-  
 
     <!-- 修改班级的对话框 -->
     <el-dialog
@@ -512,21 +522,25 @@ import {
 } from "network/api/coursepian";
 import { getAdminUserjs, getAdminUserfdy } from "network/api/adminuser";
 import { addAdjustClass } from "network/api/adjust";
+import permission from "@/directive/permission/index.js"; // 权限判断指令
 export default {
+  directives: { permission },
   name: "departmentlist",
   data() {
     return {
+      fdyjs: true,
+      sjsoptions: [],
+      sfdyoptions: [],
+
       //添加学生对话框
       addDialogVisible: false,
-
       // 获取用户列表的参数对象
       queryInfo: {
         query: {
           name: "",
-          college: "",
-          stage: "",
-          room_number: "",
-          sum: "",
+          depar_id: "",
+          fdy_id: "",
+          js_id: "",
         },
         // 当前的页数
         pagenum: 1,
@@ -1121,8 +1135,48 @@ export default {
         }
       }
     },
+    "queryInfo.query.depar_id": function (val) {
+      console.log("id", val);
+      if (val) {
+        this.sjsoptions = [];
+        this.sfdyoptions = [];
+        this.sgetDepartmentjs(val);
+        this.sgetDepartmentfdy(val);
+        this.fdyjs = false;
+      } else {
+        this.queryInfo.query.js_id = "";
+        this.queryInfo.query.fdy_id = "";
+        this.fdyjs = true;
+        this.jsoptions = [];
+        this.fdyoptions = [];
+      }
+    },
   },
   methods: {
+    async sgetDepartmentjs(id) {
+      const res = await getallDepartment({ depar_id: id, role: "讲师" });
+      console.log(res, 78978979, "讲师");
+      if (res.code == 200) {
+        res.data.forEach((item) => {
+          const obj = {};
+          obj.value = item._id;
+          obj.label = item.name;
+          this.sjsoptions.push(obj);
+        });
+      }
+    },
+    async sgetDepartmentfdy(id) {
+      const res = await getallDepartment({ depar_id: id, role: "导员" });
+      console.log(res, 78978979, "导员");
+      if (res.code == 200) {
+        res.data.forEach((item) => {
+          const obj = {};
+          obj.value = item._id;
+          obj.label = item.name;
+          this.sfdyoptions.push(obj);
+        });
+      }
+    },
     //获取所有学院
     async getallDepartment() {
       const res = await getallDepartment();
@@ -1146,7 +1200,7 @@ export default {
         page: this.queryInfo.pagenum,
         page_size: this.queryInfo.pagesize,
       });
-      console.log('班级信息',result.data)
+      console.log("班级信息", result.data);
       if (result) {
         this.classlist = result.data; //列表中展示的数据内容
         this.total = result.count; //数据总条数
@@ -1334,7 +1388,7 @@ export default {
       this.adjustForm.course_plan = val.course_plan;
       const res = await getTeachingItem(val.teaching_time);
       // const res = (await getTeachingItem(val.id)).data;
-      console.log('教学周期res',res)
+      console.log("教学周期res", res);
       console.log("sssssssss", this.adjustForm);
       const am_class = res.am_class.split(",");
       const pm_class = res.pm_class.split(",");

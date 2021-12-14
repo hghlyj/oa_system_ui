@@ -12,6 +12,11 @@ const getters = {
     introduction: state => state.user.introduction,
     roles: state => state.user.roles,
 
+    SubtratMarksLists: state => state.scorelist.SubtratMarksLists,
+    AwardedMarksLists: state => state.scorelist.AwardedMarksLists,
+    rdedMarksLists: state => state.scorelist.rdedMarksLists,
+    total: state => state.scorelist.total,
+
     permission_routes: state => state.permission.routes,
 
 

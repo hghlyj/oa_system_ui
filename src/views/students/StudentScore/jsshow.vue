@@ -1,6 +1,6 @@
 <template>
     <div>
-        积分审核
+讲师查看加减分
     </div>
 </template>
 
@@ -35,6 +35,6 @@ export default {
 };
 </script>
 
-<style scoped lang="scss">
+<style scoped lang="less">
 
 </style>
